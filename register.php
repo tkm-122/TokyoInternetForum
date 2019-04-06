@@ -13,7 +13,7 @@ if(isset($_POST['signup'])){
   $password = $mysqli->real_escape_string($_POST['password']);
   $password = password_hash($password, PASSWORD_DEFAULT);
 
-  $query = "INSET INTO users(username,email,password) VALUES('$username','$email','$password')";
+  $query = "INSERT INTO users(username,email,password) VALUES('$username','$email','$password')";
 
   if($mysqli->query($query)){  ?>
     <div class="alert alert-success" role="alert">登録しました</div>
