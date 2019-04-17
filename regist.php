@@ -15,16 +15,16 @@
 
     while($row = $result->fetch_assoc()){
       $username = $row['username'];
+      $id = $row['id'];
     }
 
     $result->close();
 
 
-    $name    = $username;
     $message = $_REQUEST['message'];
     $created = date('Y-m-d H:i:s');
 
-    $result = $mysqli->query("INSERT INTO messages(name, message, created) VALUES('$name', '$message', '$created')");
+    $result = $mysqli->query("INSERT INTO messages(user_id, message, created) VALUES('$id', '$message', '$created')");
 
     $mysqli->close();
 

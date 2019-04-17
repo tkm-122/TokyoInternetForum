@@ -4,7 +4,6 @@
     if(!isset($_SESSION['user'])){
       header("Location: login.php");
     }
-
   $query = "SELECT *FROM users WHERE id=".$_SESSION['user']."";
   $result = $mysqli->query($query);
   if(!$result){
@@ -12,19 +11,15 @@
     $mysqli->close();
     exit();
   }
-
-
-  while($row = $result->fetch_assoc()){
-    $username = $row['username'];
+  while($key = $result->fetch_assoc()){
+    $username = $key['username'];
+    $userid = $key['id'];
   }
-
  $result->close();
 
  $sql = 'SELECT * FROM messages ORDER BY no DESC' ;
- $result = $mysqli->query($sql);
-
+ $messages = $mysqli->query($sql);
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -46,13 +41,11 @@
       <div class="container">
         <h1 class="title"> - 掲示板 - </h1>
         <h5>ようこそ
-          <a href="home.php"></a><?php  echo $username; ?></a>
+          <a href="home.php"><?php  echo htmlspecialchars($username); ?></a>
           さん</h5>
 
         <div class="main-form">
           <form action="regist.php" method="post">
-            名前：<br />
-            <input type="text" class="form" name="name" size="30" value="" /><br />
             メッセージ：<br />
             <textarea class="form" name="message" cols="30" rows="5"></textarea><br />
             <br />
@@ -61,36 +54,44 @@
         </div>
 
         <div class="display">
-          <?php
-                $sql = 'SELECT * FROM messages ORDER BY no DESC' ;
-                $result = $mysqli->query($sql);
-          ?>
+         <?php
+               $sql = 'SELECT * FROM messages ORDER BY no DESC' ;
+               $result = $mysqli->query($sql);
+         ?>
 
-          <?php foreach($result as $row) : ?>
-              <h3> <?php
+         <?php foreach($messages as $row) : ?>
 
-                  echo '[No.' . $row['no'] . '] ' . htmlspecialchars($row['name'], ENT_QUOTES) . ' ' . $row['created'];
-                  ?>
-                  <form action="delete.php" method="post">
-                     <button type="submit" > <i class="fas fa-comment-slash"></i>
-  削除
-                     <input type="hidden" name="no" value="<?=$row['no']?>">
-                     </button>
-                  </form>
+         <?php
+            $users = "SELECT * FROM users WHERE id=".$row['user_id']."";
+            $user = $mysqli->query($users);
 
+            while($fin = $user->fetch_assoc()){
+              $user_name = $fin['username'];
+              }
+         ?>
 
-              <?php
-                  echo "<br >";
+        <h3> <?php
+               echo '[No.' . $row['no'] . '] ';
+               echo htmlspecialchars($user_name.'さん ');
+               echo $row['created'];
+               ?>
 
-                  echo "<br />\n";
-                  echo nl2br(htmlspecialchars($row['message'], ENT_QUOTES));
+             <?php if($userid == $row['user_id']): ?>
+                 <form action="delete.php" method="post">
+                    <button type="submit" > <i class="fas fa-comment-slash"></i>
+                    削除
+                    <input type="hidden" name="no" value="<?=$row['no']?>">
+                    </button>
+                 </form>
+            <?php endif; ?>
 
-              ?></h3>
-            <?php endforeach ?>
-
-
-            <?php $mysqli->close() ?>
-
+            <?php
+                 echo "<br >";
+                 echo "<br />\n";
+                 echo nl2br(htmlspecialchars($row['message'], ENT_QUOTES));
+            ?></h3>
+           <?php endforeach ?>
+           <?php $mysqli->close() ?>
           </div>
 
         </div>
