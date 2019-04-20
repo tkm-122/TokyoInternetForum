@@ -12,19 +12,16 @@ if(isset($_POST['signup'])){
   $email = $mysqli->real_escape_string($_POST['email']);
   $password = $mysqli->real_escape_string($_POST['password']);
   $password = password_hash($password, PASSWORD_DEFAULT);
-
-  $query = "INSERT INTO users(username,email,password) VALUES('$username','$email','$password')";
-
-  if($mysqli->query($query)){  ?>
-    <div class="alert alert-success" role="alert">登録しました</div>
-  <?php } else { ?>
-      <div class="alert alert-danger" role="alert">エラーが発生しました</div>
-    <?php
-  }
 }
 
+$sql = sprintf('SELECT COUNT(*) AS cnt  FROM users WHERE email = "%s" ',$email);
+$record = $mysqli->query($sql);
+while($table = $record->fetch_assoc()){
+   $count = $table['cnt'];
+}
 
 ?>
+
 
 
 <!DOCTYPE html>
@@ -46,6 +43,28 @@ if(isset($_POST['signup'])){
     <div class="main">
       <div class="container">
         <h1 class="title"> - 登録画面 - </h1>
+        <?php
+            echo "<br>";
+            if($email == ''){
+
+            }elseif ($count > 0 ){
+                    $error['email'] = 'duplicate';
+                    ?>
+                    <div class="alert alert-danger" role="alert">登録済みのメールア>ドレスです。</div>
+                    <?php
+            }else{
+                    $query = "INSERT INTO users(username,email,password) VALUES('$username','$email','$password')";
+                    if($mysqli->query($query)){  ?>
+                    <div class="alert alert-success" role="alert">登録しました</div>
+                      <?php } else { ?>
+                    <div class="alert alert-danger" role="alert">エラーが発生しまし>た</div>
+                    <?php
+                    }
+                    echo "<br>";
+            }
+            $mysqli->close();
+
+        ?>
         <form class="input" action="" method="post">
           <h4>ユーザー名</h4>
           <input type="text" class="form" name="username" placeholder="ユーザー名" required />
